@@ -25,7 +25,7 @@ class GameScene: SKScene
     override func didMove(to view: SKView)
     {
         initializeMenu()
-        game = GameManager()
+        game = GameManager(scene: self)
         
         initializeGameView()
         
@@ -56,25 +56,48 @@ class GameScene: SKScene
     {
         print("start game")
         
-        gameLogo.run(SKAction.move(by: CGVector(dx: -50, dy: 600), duration: 0.5))
+        gameLogo.run(SKAction.fadeOut(withDuration: 0.4))
         {
             self.gameLogo.isHidden = true
         }
         playButton.run(SKAction.scale(to: 0, duration: 0.3))
         {
             self.playButton.isHidden = true
+            
         }
         
-        bestScore = SKLabelNode(fontNamed: "ChalkDuster")
-        bestScore.zPosition = 1
-        bestScore.position = CGPoint(x: 0, y: (frame.size.height / -2) + 25)
-        bestScore.fontSize = 40
-        bestScore.text = "Best Score: 0"
-        bestScore.fontColor = SKColor.white
-        self.addChild(bestScore)
+        bestScore.run(SKAction.fadeIn(withDuration: 1.0))
+        {
+            self.bestScore.isHidden = false
+        }
+        
+        currentScore.run(SKAction.fadeIn(withDuration: 1.0))
+        {
+            self.currentScore.isHidden = false
+        }
+        
+        gameGB.run(SKAction.fadeIn(withDuration: 1.0))
+        {
+            self.gameGB.isHidden = false
+        }
+        
+        self.game.initGame()
+        
+        
+        /*
+        self.bestScore.setScale(0)
+        self.bestScore.run(SKAction.scale(to: 1, duration: 0.6))
         
         self.currentScore.isHidden = false
+        self.currentScore.setScale(0)
+        self.currentScore.run(SKAction.scale(to: 1, duration: 0.6))
+        
         self.gameGB.isHidden = false
+        self.gameGB.setScale(0)
+        self.gameGB.run(SKAction.scale(to: 1, duration: 0.6))
+        */
+        
+        
         
     }
     
@@ -107,16 +130,26 @@ class GameScene: SKScene
         
     }
     
+    // this function sets the game board and scores
     private func initializeGameView()
     {
         currentScore = SKLabelNode(fontNamed: "ChalkDuster")
         currentScore.zPosition = 1
         currentScore.position = CGPoint(x: 0, y: (frame.size.height / -2) + 75)
         currentScore.fontSize = 40
-        self.currentScore.isHidden = true
+        self.currentScore.alpha = 0.0
         currentScore.text = "Score: 0"
         currentScore.fontColor = SKColor.white
         self.addChild(currentScore)
+        
+        bestScore = SKLabelNode(fontNamed: "ChalkDuster")
+        bestScore.zPosition = 1
+        bestScore.position = CGPoint(x: 0, y: (frame.size.height / -2) + 25)
+        bestScore.fontSize = 40
+        self.bestScore.alpha = 0.0
+        bestScore.text = "Best Score: 0"
+        bestScore.fontColor = SKColor.white
+        self.addChild(bestScore)
         
         let width = 550
         let height = 1100
@@ -125,12 +158,13 @@ class GameScene: SKScene
         gameGB = SKShapeNode(rect: rect, cornerRadius: 0.02)
         gameGB.fillColor = SKColor.gray
         gameGB.zPosition = 2
-        self.gameGB.isHidden = true
+        self.gameGB.alpha = 0.0
         self.addChild(gameGB)
         
         createGameBoard(width: width, height: height)
     }
     
+    // this function creates the game board using array
     private func createGameBoard(width: Int, height: Int)
     {
         let cellWidth: CGFloat = 27.5
