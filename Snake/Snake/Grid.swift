@@ -53,6 +53,7 @@ class Grid: SKSpriteNode {
         context.addPath(bezierPath.cgPath)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
+
         
         return SKTexture(image: image!)
     }

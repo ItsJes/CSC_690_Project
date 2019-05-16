@@ -15,11 +15,10 @@
 		C248613B2268742700C18E69 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C248613A2268742700C18E69 /* GameManager.swift */; };
 		C24B17A0227F8AC200B466FA /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = C24B179F227F8AC200B466FA /* GameScene.sks */; };
 		C2677106227F9A8B00317A7E /* SnakeAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2677105227F9A8B00317A7E /* SnakeAnimation.swift */; };
-		C29D05B5227FADD900792C62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C29D05B4227FADD900792C62 /* Assets.xcassets */; };
 		C2B8F1012280DB31003D5752 /* GrassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B8F1002280DB31003D5752 /* GrassBackground.swift */; };
+		C2C8A44A228CF1EC0010684D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2C8A449228CF1EC0010684D /* Assets.xcassets */; };
 		C2F364B82280B726006D3D84 /* PlayButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F364B72280B726006D3D84 /* PlayButton.swift */; };
 		C2F5487C228516AD00F78BA0 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F5487B228516AD00F78BA0 /* Grid.swift */; };
-		C2F6056D228141840099BF38 /* Snake.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F6056C228141840099BF38 /* Snake.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,11 +32,10 @@
 		C248613A2268742700C18E69 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		C24B179F227F8AC200B466FA /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		C2677105227F9A8B00317A7E /* SnakeAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnakeAnimation.swift; sourceTree = "<group>"; };
-		C29D05B4227FADD900792C62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C2B8F1002280DB31003D5752 /* GrassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrassBackground.swift; sourceTree = "<group>"; };
+		C2C8A449228CF1EC0010684D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C2F364B72280B726006D3D84 /* PlayButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayButton.swift; sourceTree = "<group>"; };
 		C2F5487B228516AD00F78BA0 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
-		C2F6056C228141840099BF38 /* Snake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snake.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,7 +68,7 @@
 		C24861212268700A00C18E69 /* Snake */ = {
 			isa = PBXGroup;
 			children = (
-				C29D05B4227FADD900792C62 /* Assets.xcassets */,
+				C2C8A449228CF1EC0010684D /* Assets.xcassets */,
 				C24861222268700A00C18E69 /* AppDelegate.swift */,
 				C24861282268700A00C18E69 /* GameScene.swift */,
 				C248613A2268742700C18E69 /* GameManager.swift */,
@@ -82,7 +80,6 @@
 				C2677105227F9A8B00317A7E /* SnakeAnimation.swift */,
 				C2F364B72280B726006D3D84 /* PlayButton.swift */,
 				C2B8F1002280DB31003D5752 /* GrassBackground.swift */,
-				C2F6056C228141840099BF38 /* Snake.swift */,
 				C2F5487B228516AD00F78BA0 /* Grid.swift */,
 			);
 			path = Snake;
@@ -148,7 +145,7 @@
 			files = (
 				C248612E2268700A00C18E69 /* Main.storyboard in Resources */,
 				C24B17A0227F8AC200B466FA /* GameScene.sks in Resources */,
-				C29D05B5227FADD900792C62 /* Assets.xcassets in Resources */,
+				C2C8A44A228CF1EC0010684D /* Assets.xcassets in Resources */,
 				C24861332268700A00C18E69 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -160,7 +157,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2F6056D228141840099BF38 /* Snake.swift in Sources */,
 				C2677106227F9A8B00317A7E /* SnakeAnimation.swift in Sources */,
 				C24861292268700A00C18E69 /* GameScene.swift in Sources */,
 				C2B8F1012280DB31003D5752 /* GrassBackground.swift in Sources */,

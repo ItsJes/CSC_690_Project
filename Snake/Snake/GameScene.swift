@@ -8,6 +8,12 @@
 
 import SpriteKit
 import GameplayKit
+import CoreMotion
+
+let snakeHead = SKSpriteNode(imageNamed: "snakeHead_1")
+let snakeBody = SKSpriteNode(imageNamed: "snakeBody_1")
+let snakeTail = SKSpriteNode(imageNamed: "snakeTail")
+
 
 class GameScene: SKScene, SKPhysicsContactDelegate 
 {
@@ -15,19 +21,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var bestScore: SKLabelNode!
     var currentScore: SKLabelNode!
     var gameGB: SKShapeNode!
+    var theRotation: CGFloat = 0
+    var offset: CGFloat = 0
+    var lastTouch: CGPoint? = nil
+    var nextEncounterSpawnPosition = CGFloat(150)
+    
+    var motionManager = CMMotionManager()
+    var destX:CGFloat  = 0.0
+    
+     var xVelocity: CGFloat = 0
     
     var playerPosition: [(Int, Int)] = []
     var gameArray: [(node: SKShapeNode, x: Int, y: Int)] = []
     let snakeAnimation = SnakeAnimation()
     let playButton = PlayButton()
     let background = GrassBackground()
-   // let snake = Snake()
     
-    let snakeHead = SKSpriteNode(imageNamed: "snakeHead_1")
-    let snakeBody = SKSpriteNode(imageNamed: "snakeBody_1")
-    let snakeTail = SKSpriteNode(imageNamed: "snakeTail")
+    let rotate = UIRotationGestureRecognizer()
+    let tap = UITapGestureRecognizer()
     
     var game: GameManager!
+    
+    let apple = SKSpriteNode(imageNamed: "apple")
     
     override func didMove(to view: SKView)
     {
@@ -35,18 +50,124 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         game = GameManager(scene: self)
         initializeGameView()
         snakeAnimation.beginAnimation()
+        addSwipe()
         
+        rotate.addTarget(self, action: #selector(GameScene.rotatedView(_:)))
+        self.view!.addGestureRecognizer(rotate)
+        
+    }
+    
+    func randomFood() {
+        //supposed to pick random point within the screen width
+        let xPos = randomBetweenNumbers(firstNum: 0, secondNum: frame.width )
+        
+        apple.position = CGPoint(x: xPos, y: self.frame.size.height / 4)
+        apple.setScale(0.10)
+        //apple.physicsBody = SKPhysicsBody(circleOfRadius: apple.size.width/2)
+        apple.zPosition = 2
+        apple.alpha = 1
+        apple.physicsBody?.affectedByGravity = false
+        apple.physicsBody?.categoryBitMask = 0
+        apple.physicsBody?.contactTestBitMask = 0
+        addChild(apple)
+        //SKAction.removeFromParent()
+    }
+ 
+    
+    func randomBetweenNumbers(firstNum: CGFloat, secondNum: CGFloat) -> CGFloat {
+        return CGFloat(arc4random()) / CGFloat(UINT32_MAX) * abs(firstNum - secondNum) + min(firstNum, secondNum)
+    }
+    @objc func rotatedView(_ sender: UIRotationGestureRecognizer)
+    {
+        if(sender.state == .began)
+        {
+            print("We Bigin")
+        }
+        
+        if(sender.state == .changed)
+        {
+            print("We Rotated")
+            
+            theRotation = CGFloat(sender.rotation) + self.offset
+            theRotation *= -1
+            
+            snakeHead.zRotation = theRotation
+            snakeTail.zRotation = theRotation
+            snakeBody.zRotation = theRotation
+        }
+        
+        if(sender.state == .ended)
+        {
+            print("We ended")
+            self.offset = theRotation * -1
+        }
+        
+        
+    }
+    /*
+    @objc func tappedView()
+    {
+        let force: CGFloat = 5
+        print("we tapped")
+        
+        let xVect: CGFloat = force * sin(theRotation) * -10
+        let yVect: CGFloat = force * cos(theRotation) * 10
+        
+        let theVect: CGVector = CGVector(dx: xVect, dy: yVect)
+        
+        snakeHead.physicsBody?.applyImpulse(theVect)
+        snakeBody.physicsBody?.applyImpulse(theVect)
+        snakeTail.physicsBody?.applyImpulse(theVect)
+    }
+    */
+    func addSwipe() {
+        let directions: [UISwipeGestureRecognizer.Direction] = [.right, .left, .up, .down]
+        for direction in directions {
+            let gesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
+            gesture.direction = direction
+            self.view?.addGestureRecognizer(gesture)
+            
+        }
+    }
+    
+    @objc func handleSwipe(gesture: UIGestureRecognizer) {
+        if let gesture = gesture as? UISwipeGestureRecognizer
+        {
+            switch gesture.direction
+            {
+            case .up:
+                print("swiped up")
+            case .left:
+                print("swiped left")
+            case .right:
+                print("swiped right")
+            case .down:
+                print("swiped down")
+            default:
+                print("Not a gesture")
+            }
+        }
     }
     
     override func update(_ currentTime: TimeInterval)
     {
         // Called before each frame is rendered
         game.update(time: currentTime)
+        if let touch = lastTouch {
+            let impulseVector = CGVector(dx: touch.x - snakeHead.position.x,dy: 0)
+            // If myShip starts moving too fast or too slow, you can multiply impulseVector by a constant or clamp its range
+            snakeHead.physicsBody?.applyImpulse(impulseVector)
+            snakeBody.physicsBody?.applyImpulse(impulseVector)
+            
+        }
+        
+
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches
         {
+            
             let location = touch.location(in: self)
             let touchedNode = self.nodes(at: location)
             for node in touchedNode
@@ -57,8 +178,44 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                 }
             }
         }
+        
+        let force: CGFloat = 5
+        print("we tapped")
+        
+        let xVect: CGFloat = force * sin(theRotation) * -10
+        let yVect: CGFloat = force * cos(theRotation) * 10
+        
+        let theVect: CGVector = CGVector(dx: xVect, dy: yVect)
+        
+        snakeHead.physicsBody?.applyImpulse(theVect)
+        snakeBody.physicsBody?.applyImpulse(theVect)
+        snakeTail.physicsBody?.applyImpulse(theVect)
+        /*
+        for touch in touches
+        {
+            let location = touch.location(in: self)
+            
+            snakeHead.position.x = location.x
+            snakeHead.position.y = location.y
+            
+            print("x: \(snakeHead.position.x), y: \(snakeHead.position.y)")
+            
+            let move = SKAction.applyForce(CGVector(dx: location.x, dy: location.y), duration: 0.2)
+            self.run(move)
+            
+        }
+       */
+ 
     }
     
+    
+    /*
+    func movement(){
+        let animate = SKAction.move()
+        let forever = SKAction.repeatForever(animate)
+        self.run(forever)
+    }
+    */
     private func startGame()
     {
         print("start game")
@@ -91,17 +248,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         snakeHead.run(SKAction.fadeIn(withDuration: 1.0))
         {
-            self.snakeHead.isHidden = false
+            snakeHead.isHidden = false
         }
         
         snakeBody.run(SKAction.fadeIn(withDuration: 1.0))
         {
-            self.snakeBody.isHidden = false
+            snakeBody.isHidden = false
         }
         
         snakeTail.run(SKAction.fadeIn(withDuration: 1.0))
         {
-            self.snakeTail.isHidden = false
+            snakeTail.isHidden = false
         }
         
         background.run(SKAction.fadeIn(withDuration: 1.0))
@@ -109,6 +266,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             self.background.isHidden = false
         }
         
+        apple.run(SKAction.fadeIn(withDuration: 1.0))
+        {
+            self.apple.isHidden = false
+        }
         
  
         /*
@@ -119,30 +280,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         */
         self.game.initGame()
         
-        
-        /*
-        self.bestScore.setScale(0)
-        self.bestScore.run(SKAction.scale(to: 1, duration: 0.6))
-        
-        self.currentScore.isHidden = false
-        self.currentScore.setScale(0)
-        self.currentScore.run(SKAction.scale(to: 1, duration: 0.6))
-        
-        self.gameGB.isHidden = false
-        self.gameGB.setScale(0)
-        self.gameGB.run(SKAction.scale(to: 1, duration: 0.6))
-        */
 
     }
     
     private func initializeMenu()
     {
-        
-        self.snakeHead.isHidden = true
-        self.snakeBody.isHidden = true
-        self.snakeTail.isHidden = true
- 
-        self.background.isHidden = true
  
         //creates game title
         gameLogo = SKLabelNode(fontNamed: "Chalkduster")
@@ -189,130 +331,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         background.zPosition = -1
         background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         background.size = CGSize(width: self.frame.width, height: self.frame.height)
+        background.isHidden = true
         addChild(background)
         
-        self.physicsBody = SKPhysicsBody (edgeLoopFrom: self.frame)
-        self.physicsWorld.contactDelegate = self
+        apple.isHidden = true
         
-        self.physicsWorld.gravity = CGVector(dx: 0,dy: -9.8)
-        
-        if let grid = Grid(blockSize: 40.0, rows: 20, cols: 20) {
-            grid.position = CGPoint (x:frame.midX, y:frame.midY)
-            addChild(grid)
-            
-            snakeHead.physicsBody = SKPhysicsBody(rectangleOf: snakeHead.frame.size)
-            snakeHead.physicsBody!.isDynamic = false
-           // snakeHead.position = CGPoint(x: self.frame.midX + 50, y: self.frame.midY)
-            snakeHead.setScale(0.2)
-            snakeHead.position = grid.gridPosition(row: 10, col: 10)
-            snakeHead.anchorPoint = CGPoint.zero
-            
-            snakeBody.physicsBody = SKPhysicsBody(rectangleOf: snakeBody.frame.size)
-            snakeBody.physicsBody!.isDynamic = true
-            snakeBody.setScale(0.2)
-            snakeBody.position = grid.gridPosition(row: 10, col: 9)
-            snakeBody.anchorPoint = CGPoint.zero
-            
-            snakeTail.physicsBody = SKPhysicsBody(rectangleOf: snakeTail.frame.size)
-            snakeTail.physicsBody!.isDynamic = true
-            snakeTail.setScale(0.2)
-            snakeTail.position = grid.gridPosition(row: 10, col: 8)
-            snakeTail.anchorPoint = CGPoint.zero
-            
-            grid.addChild(snakeHead)
-            grid.addChild(snakeBody)
-            grid.addChild(snakeTail)
-            
-            let myJoint1 = SKPhysicsJointFixed.joint(withBodyA: snakeHead.physicsBody!, bodyB: snakeBody.physicsBody!, anchor: anchorPoint)
-            let myJoint2 = SKPhysicsJointFixed.joint(withBodyA: snakeBody.physicsBody!, bodyB: snakeTail.physicsBody!, anchor: anchorPoint)
-            
-            self.physicsWorld.add(myJoint1)
-            self.physicsWorld.add(myJoint2)
+        let wait = SKAction.wait(forDuration: 5, withRange: 3)
+        let spawn = SKAction.run {
+            self.randomFood()
         }
         
-        /*
-        // Setup physics body to the scene (borders)
-        self.physicsBody = SKPhysicsBody (edgeLoopFrom: self.frame)
-        self.physicsWorld.contactDelegate = self
-        
-        // Change gravity settings of the physics world
-        self.physicsWorld.gravity = CGVector(dx: 0,dy: -9.8)
-        
-        // Head object properties
-        snakeHead.physicsBody = SKPhysicsBody(rectangleOf: snakeHead.frame.size)
-        snakeHead.physicsBody!.isDynamic = false
-        snakeHead.size = CGSize(width: 50, height: 50)
-        snakeHead.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        
-        // Body object properties
-        snakeBody.physicsBody = SKPhysicsBody(rectangleOf: snakeBody.frame.size)
-        snakeBody.physicsBody!.isDynamic = true
-        snakeBody.size = CGSize(width: 50, height: 50)
-        snakeBody.anchorPoint = CGPoint.zero
-        snakeBody.position = CGPoint(x: self.frame.midX - 75, y: self.frame.midY - 25)
-        
-        // Tail object Properties
-        snakeTail.physicsBody = SKPhysicsBody(rectangleOf: snakeBody.frame.size)
-        snakeTail.physicsBody!.isDynamic = true
-        snakeTail.size = CGSize(width: 50, height: 50)
-        snakeTail.anchorPoint = CGPoint.zero
-        snakeTail.position = CGPoint(x: self.frame.midX - 125, y: self.frame.midY - 25)
-        
-        self.addChild(snakeHead)
-        self.addChild(snakeBody)
-        self.addChild(snakeTail)
-        
-        let myJoint1 = SKPhysicsJointFixed.joint(withBodyA: snakeHead.physicsBody!, bodyB: snakeBody.physicsBody!, anchor: anchorPoint)
-        let myJoint2 = SKPhysicsJointFixed.joint(withBodyA: snakeBody.physicsBody!, bodyB: snakeTail.physicsBody!, anchor: anchorPoint)
-        
-        self.physicsWorld.add(myJoint1)
-        self.physicsWorld.add(myJoint2)
- */
-    }
-        
-        /*
-        let width = 550
-        let height = 1100
-        let rect = CGRect(x: -width / 2, y: -height / 2, width: width, height: height)
-        
-        gameGB = SKShapeNode(rect: rect, cornerRadius: 0.02)
-        gameGB.fillColor = SKColor.clear
-        gameGB.zPosition = 2
-        self.gameGB.alpha = 0.0
-        self.addChild(gameGB)
-        
-        createGameBoard(width: width, height: height)
+        let spawning = SKAction.sequence([wait,spawn])
+        self.run(SKAction.repeat((spawning), count: 3))
  
     }
-    
-    // this function creates the game board using array
-    private func createGameBoard(width: Int, height: Int)
-    {
-        let cellWidth: CGFloat = 27.5
-        let numRows = 40
-        let numCols = 20
-        var x = CGFloat(width / -2) + (cellWidth / 2)
-        var y = CGFloat(height / 2) - (cellWidth / 2)
-        
-        for i in 0...numRows - 1
-        {
-            for j in 0...numCols - 1
-            {
-                let cellNode = SKShapeNode(rectOf: CGSize(width: cellWidth, height: cellWidth))
-                cellNode.strokeColor = SKColor.clear
-                cellNode.zPosition = 2
-                cellNode.position = CGPoint(x: x, y: y)
-                gameArray.append((node: cellNode, x: i, y: j))
-                gameGB.addChild(cellNode)
-                
-                x += cellWidth
-                
-            }
-            
-            x = CGFloat(width / -2) + (cellWidth / 2)
-            y -= cellWidth
-        }
-        
-    }
- */
 }
+        
+
+
