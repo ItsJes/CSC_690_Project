@@ -54,23 +54,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         rotate.addTarget(self, action: #selector(GameScene.rotatedView(_:)))
         self.view!.addGestureRecognizer(rotate)
+
         
     }
     
     func randomFood() {
         //supposed to pick random point within the screen width
+        
         let xPos = randomBetweenNumbers(firstNum: 0, secondNum: frame.width )
         
-        apple.position = CGPoint(x: xPos, y: self.frame.size.height / 4)
+        apple.position = CGPoint(x: xPos, y: 0)
         apple.setScale(0.10)
-        //apple.physicsBody = SKPhysicsBody(circleOfRadius: apple.size.width/2)
+        apple.physicsBody = SKPhysicsBody(circleOfRadius: apple.size.width/2)
         apple.zPosition = 2
         apple.alpha = 1
         apple.physicsBody?.affectedByGravity = false
         apple.physicsBody?.categoryBitMask = 0
         apple.physicsBody?.contactTestBitMask = 0
         addChild(apple)
-        //SKAction.removeFromParent()
+    }
+    
+    func CollisionWithSnake(apple: SKSpriteNode, snakeHead: SKSpriteNode){
+        apple.removeFromParent()
+        snakeHead.removeFromParent()
     }
  
     
@@ -160,8 +166,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             snakeBody.physicsBody?.applyImpulse(impulseVector)
             
         }
-        
-
+       // self.apple.removeFromParent()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -179,18 +184,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             }
         }
         
-        let force: CGFloat = 5
-        print("we tapped")
         
-        let xVect: CGFloat = force * sin(theRotation) * -10
-        let yVect: CGFloat = force * cos(theRotation) * 10
-        
-        let theVect: CGVector = CGVector(dx: xVect, dy: yVect)
-        
-        snakeHead.physicsBody?.applyImpulse(theVect)
-        snakeBody.physicsBody?.applyImpulse(theVect)
-        snakeTail.physicsBody?.applyImpulse(theVect)
-        /*
         for touch in touches
         {
             let location = touch.location(in: self)
@@ -204,7 +198,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             self.run(move)
             
         }
-       */
+       
  
     }
     
@@ -339,10 +333,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let wait = SKAction.wait(forDuration: 5, withRange: 3)
         let spawn = SKAction.run {
             self.randomFood()
+            print("Apple Spawned")
+            //self.apple.removeFromParent()
+           // print("Removed from Parent")
         }
-        
         let spawning = SKAction.sequence([wait,spawn])
-        self.run(SKAction.repeat((spawning), count: 3))
+        self.run(SKAction.repeat((spawning), count: 1), withKey: "SpawnStop")
  
     }
 }
