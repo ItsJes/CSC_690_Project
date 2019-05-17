@@ -5,13 +5,16 @@
 //  Created by Jessica Sendejo on 4/18/19.
 //  Copyright © 2019 Jessica Sendejo. All rights reserved.
 //
-
+import UIKit
 import SpriteKit
 
 var arraySprites: [SKSpriteNode] = [SKSpriteNode]()
+let snakeCategory: UInt32 = 0x1 << 0
+let appleCategory: UInt32 = 0x1 << 1
 
 class GameManager
 {
+
     let grid = Grid()
     var scene: GameScene!
     
@@ -28,8 +31,6 @@ class GameManager
         makeSnake()
 
     }
-    
-    
     
     func update(time: Double)
     {
@@ -80,6 +81,11 @@ class GameManager
             snakeBody.isHidden = true
             snakeTail.isHidden = true
             
+            snakeHead.name = "snakeNode"
+            
+            snakeHead.physicsBody?.usesPreciseCollisionDetection = true
+            snakeHead.physicsBody?.categoryBitMask = snakeCategory
+            
             grid.addChild(snakeHead)
             grid.addChild(snakeBody)
             grid.addChild(snakeTail)
@@ -90,7 +96,33 @@ class GameManager
             scene.physicsWorld.add(myJoint1)
             scene.physicsWorld.add(myJoint2)
             
+            snakeHead.physicsBody?.usesPreciseCollisionDetection = true
+            snakeHead.physicsBody?.categoryBitMask = snakeCategory
+            snakeHead.physicsBody?.collisionBitMask = snakeCategory | appleCategory
+            snakeHead.physicsBody?.contactTestBitMask =
+                snakeCategory | appleCategory
+            
         }
     }
     
+    func didBegin(_ contact: SKPhysicsContact)
+    {
+        let secondNode = contact.bodyB.node as! SKSpriteNode
+        
+        if (contact.bodyA.categoryBitMask == snakeCategory) &&
+            (contact.bodyB.categoryBitMask == appleCategory) {
+            
+            let contactPoint = contact.contactPoint
+            let contact_y = contactPoint.y
+            let target_y = secondNode.position.y
+            let margin = secondNode.frame.size.height/2 - 25
+            
+            if (contact_y > (target_y - margin)) &&
+                (contact_y < (target_y + margin)) {
+                print("Hit")
+                newScore += 1
+                apple.removeFromParent()
+            }
+        }
+    }
 }
