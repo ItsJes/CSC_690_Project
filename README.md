@@ -8,3 +8,5 @@ The must features this game should have is the basic rules of snake such as game
 
 The nice to have features that I would love to add to the game is adding random power ups to appear. I would like to have a random food appear one for slowing down and one for invincibility. The slow down one would slow to the snake by the amount a normal food would have increased it and the invincibility will make you invincible for a short amount of time so if you hit yourself or a bomb during that duration the game won't end. 
 
+# Credit:
+Snake sprite used came from website http://www.biryuk.com/2015/05/free-snake-sprites.html
